@@ -11,7 +11,7 @@ import calendar, html, json, re, sys, time, urllib.parse, urllib.request
 import config
 
 C = config.cargar()
-UA = {"User-Agent": "Mozilla/5.0 (postula: radar personal de empleo)", "Accept": "application/json"}
+UA = {"User-Agent": "Mozilla/5.0 (jobless_doppelganger: radar personal de empleo)", "Accept": "application/json"}
 
 
 def consultas() -> list[str]:

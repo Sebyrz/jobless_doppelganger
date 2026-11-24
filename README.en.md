@@ -1,4 +1,6 @@
-# Postula
+# jobless_doppelganger
+
+*Your jobless double. It applies for you while you do something else.*
 
 **Your job-application agent inside Claude. It learns your story and the way you write, finds the
 remote jobs that fit you, and fills in the forms for you. You just say "send".**
@@ -11,7 +13,7 @@ Looking for a remote job is a second job. Ten job boards, listings that turn out
 the fine print, writing for the fifth time this week why you'd like to work somewhere, retyping your
 experience into a form that won't read your CV. Forty minutes per application, and most never answer.
 
-Postula does that work with you inside Claude:
+Your doppelganger does that work with you inside Claude:
 
 | | What it does | What you skip |
 |---|---|---|
@@ -40,7 +42,7 @@ come first, and "remote" jobs that require living in the US get filtered out.
 **Nothing goes out without your OK.** You see every answer exactly as it will be sent. One yes per
 batch. Passwords, codes and CAPTCHAs are yours to enter. On LinkedIn, you press the final button.
 
-**Your data stays on your computer.** Everything about you lives in `~/.postula`. The plugin has no
+**Your data stays on your computer.** Everything about you lives in `~/.doppelganger`. The plugin has no
 server of its own and sends your data nowhere.
 
 ## Install
@@ -51,18 +53,18 @@ You need [Claude Code](https://claude.com/claude-code) and, to read LinkedIn and
 **From GitHub** (inside Claude Code):
 
 ```
-/plugin marketplace add Sebyrz/postula
-/plugin install postula@postula
+/plugin marketplace add Sebyrz/jobless_doppelganger
+/plugin install jobless-doppelganger@jobless-doppelganger
 ```
 
 **From the zip:** unzip it anywhere and, inside Claude Code:
 
 ```
-/plugin marketplace add /path/to/postula
-/plugin install postula@postula
+/plugin marketplace add /path/to/jobless_doppelganger
+/plugin install jobless-doppelganger@jobless-doppelganger
 ```
 
-Then type **"let's start with postula"** and follow along. The agent replies in your language;
+Then type **"set up my doppelganger"** and follow along. The agent replies in your language;
 the docs and script messages are in Spanish.
 
 ## What it won't do
@@ -80,7 +82,7 @@ the docs and script messages are in Spanish.
 ```
 skills/        empezar · perfil · mejorar-cv · radar · postular (+ form-filling playbook)
 scripts/       radar, sources, fit criteria, guardia (answer checker), queue and log
-plantillas/    templates copied to ~/.postula on first run
+plantillas/    templates copied to ~/.doppelganger on first run
 tests/         python3 -m unittest discover -s tests
 ```
 

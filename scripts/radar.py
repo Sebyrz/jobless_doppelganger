@@ -3,7 +3,7 @@
 radar.py — junta todas las fuentes, filtra con un solo criterio, ordena por puntaje y deja la cola.
 No envía nada.
 
-    python3 radar.py                       # todas las fuentes -> ~/.postula/cola.jsonl y cola.md
+    python3 radar.py                       # todas las fuentes -> ~/.doppelganger/cola.jsonl y cola.md
     python3 radar.py --fuentes getonbrd    # solo GetOnBoard
     python3 radar.py --sin-tableros        # salta el barrido de bolsas de empresas (más rápido)
     python3 radar.py --top 40              # cuántos muestra cola.md (default 30)

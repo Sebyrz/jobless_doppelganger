@@ -9,7 +9,7 @@ Una sugerencia sirve si dice qué cambiar, por qué (con evidencia) y cómo qued
 no sirve; "tu bullet de Acme dice 'mejoré procesos': si el 23% que mencionaste en el chat es de ahí,
 queda 'Bajé el tiempo de onboarding 23% rediseñando el flujo con el equipo de soporte'" sí sirve.
 
-**Scripts:** `<carpeta base de este skill>/../../scripts` (fíjalo como `S`). Datos: `~/.postula`.
+**Scripts:** `<carpeta base de este skill>/../../scripts` (fíjalo como `S`). Datos: `~/.doppelganger`.
 
 ## 1. Material
 
@@ -42,7 +42,7 @@ queda 'Bajé el tiempo de onboarding 23% rediseñando el flujo con el equipo de 
 
 ## 3. Entregar
 
-Escribe `~/.postula/mejoras.md` y muéstrale en el chat las 5 primeras:
+Escribe `~/.doppelganger/mejoras.md` y muéstrale en el chat las 5 primeras:
 
 | # | Qué cambiar | Por qué (evidencia) | Cómo queda | Esfuerzo |
 |---|---|---|---|---|

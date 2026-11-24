@@ -5,7 +5,7 @@ description: Use when the person wants to find job openings — "corre el radar"
 
 # Radar de avisos
 
-**Scripts:** `<carpeta base de este skill>/../../scripts` (fíjalo como `S`). Datos: `~/.postula`.
+**Scripts:** `<carpeta base de este skill>/../../scripts` (fíjalo como `S`). Datos: `~/.doppelganger`.
 
 ## 1. Antes
 
@@ -19,7 +19,7 @@ python3 "$S/radar.py"                  # todo: 3 a 8 minutos
 python3 "$S/radar.py" --sin-tableros   # sin el barrido de bolsas de empresas: 2 a 4 minutos
 ```
 
-Córrelo en segundo plano si tu entorno lo permite. Deja `~/.postula/cola.md` (para leer) y
+Córrelo en segundo plano si tu entorno lo permite. Deja `~/.doppelganger/cola.md` (para leer) y
 `cola.jsonl` (para los otros skills). No envía nada.
 
 Cada aviso queda como:

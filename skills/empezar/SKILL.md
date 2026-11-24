@@ -1,9 +1,9 @@
 ---
 name: empezar
-description: Use when someone installs postula or wants to start their job search with it — "empezar", "configura postula", "set up postula", "instala los conectores", "conecta Chrome", "inicia sesión en GetOnBoard/LinkedIn", "primer uso". Checks Python, creates the private data folder, connects Claude in Chrome, and has the person sign in to GetOnBoard and LinkedIn themselves. Then hands off to the perfil skill.
+description: Use when someone installs jobless_doppelganger (the job-application agent) or wants to start their job search with it — "empezar", "configura mi doppelganger", "configura jobless_doppelganger", "set up my doppelganger", "instala los conectores", "conecta Chrome", "inicia sesión en GetOnBoard/LinkedIn", "primer uso". Checks Python, creates the private data folder, connects Claude in Chrome, and has the person sign in to GetOnBoard and LinkedIn themselves. Then hands off to the perfil skill.
 ---
 
-# Empezar con postula
+# Empezar con jobless_doppelganger
 
 Objetivo: en 10 minutos la persona queda con su carpeta de datos creada, Chrome conectado a Claude y
 su sesión abierta en GetOnBoard y LinkedIn. Habla en el idioma de la persona, corto y concreto.
@@ -18,9 +18,9 @@ en cada comando.
    Windows, python.org (marcar "Add to PATH"); en Linux, el gestor de paquetes. No se instala nada más:
    los scripts usan solo la biblioteca estándar.
 
-2. **Carpeta de datos.** `python3 "$S/config.py" init`. Crea `~/.postula/` con plantillas
+2. **Carpeta de datos.** `python3 "$S/config.py" init`. Crea `~/.doppelganger/` con plantillas
    (config, perfil, voz, banco de respuestas, carpeta `cv/`). Todo lo personal vive ahí, en su
-   computador, nunca dentro del plugin. Si la persona quiere otra carpeta: variable `POSTULA_HOME`.
+   computador, nunca dentro del plugin. Si la persona quiere otra carpeta: variable `DOPPELGANGER_HOME`.
 
 3. **Claude in Chrome.** Revisa si están las herramientas `mcp__claude-in-chrome__*` (búscalas con
    ToolSearch). Si no están:
@@ -36,7 +36,7 @@ en cada comando.
    sin guardar nada de la sesión. Si no tiene cuenta en GetOnBoard, sugiérele crearla ella misma:
    es la bolsa de tecnología más grande de Latinoamérica y su formulario es el más rápido de llenar.
 
-5. **CV.** Pídele su CV en PDF y que lo deje en `~/.postula/cv/` (o que te diga dónde está y lo copias
+5. **CV.** Pídele su CV en PDF y que lo deje en `~/.doppelganger/cv/` (o que te diga dónde está y lo copias
    ahí). Si no tiene CV, no pasa nada: el skill `perfil` lo arma con ella desde LinkedIn y una entrevista.
 
 6. **Conectores opcionales.** Si tiene conectado Gmail u Outlook en Claude, ofrécele (no lo hagas sin

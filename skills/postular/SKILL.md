@@ -7,7 +7,7 @@ description: Use when the person wants to apply to jobs — "postula", "sigamos 
 
 Una tanda = 5 a 10 avisos, un solo OK de la persona, envío uno por uno, registro de cada resultado.
 
-**Scripts:** `<carpeta base de este skill>/../../scripts` (fíjalo como `S`). Datos: `~/.postula`.
+**Scripts:** `<carpeta base de este skill>/../../scripts` (fíjalo como `S`). Datos: `~/.doppelganger`.
 **Cómo se llena cada sitio:** `referencias/formularios.md` (al lado de este archivo). Léelo antes de
 abrir el primer formulario.
 

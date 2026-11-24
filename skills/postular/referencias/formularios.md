@@ -12,7 +12,7 @@ los sitios cambian. Si algo no calza, mira la página (`read_page`, `find`, capt
 - **No devuelvas URLs ni valores con datos personales** desde `javascript_tool` (la herramienta puede
   bloquear el resultado si trae tokens de la URL): devuelve largos, `true/false` o conteos.
 - **CV:** sube el PDF con `file_upload` sobre el `input[type=file]` (búscalo con `find "resume"` o
-  `find "attach"`). Usa el CV que calce con el rol si hay varios en `~/.postula/cv/`.
+  `find "attach"`). Usa el CV que calce con el rol si hay varios en `~/.doppelganger/cv/`.
 - **Contacto** (nombre, correo, teléfono, LinkedIn, ciudad): de `perfil.md`. Si falta, se pregunta.
 - **Preguntas demográficas** (género, etnia, discapacidad, veterano): en blanco si son opcionales;
   si son obligatorias, "Prefiero no responder" / "Decline to self-identify".

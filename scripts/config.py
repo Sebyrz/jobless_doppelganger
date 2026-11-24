@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
 config.py — dónde viven tus datos y qué buscas. El plugin no trae nada personal: todo lo tuyo
-vive en ~/.postula (o en la carpeta que diga la variable POSTULA_HOME).
+vive en ~/.doppelganger (o en la carpeta que diga la variable DOPPELGANGER_HOME).
 
-    python3 config.py init     # crea ~/.postula con las plantillas (no pisa lo que ya existe)
+    python3 config.py init     # crea ~/.doppelganger con las plantillas (no pisa lo que ya existe)
     python3 config.py ver      # muestra la configuración efectiva (archivo + valores por defecto)
     python3 config.py ruta     # imprime la carpeta de datos
     python3 config.py estado   # qué falta para empezar a postular
@@ -12,7 +12,7 @@ from __future__ import annotations
 import copy, json, os, shutil, sys
 from pathlib import Path
 
-HOME = Path(os.environ.get("POSTULA_HOME") or Path.home() / ".postula").expanduser()
+HOME = Path(os.environ.get("DOPPELGANGER_HOME") or Path.home() / ".doppelganger").expanduser()
 PLANTILLAS = Path(__file__).resolve().parent.parent / "plantillas"
 
 CONFIG = HOME / "config.json"
@@ -88,7 +88,7 @@ def cargar() -> dict:
         try:
             data = json.loads(CONFIG.read_text(encoding="utf-8"))
         except json.JSONDecodeError as e:
-            sys.exit(f"[postula] {CONFIG} no es JSON válido: {e}")
+            sys.exit(f"[doppelganger] {CONFIG} no es JSON válido: {e}")
     data = {k: v for k, v in data.items() if not k.startswith("_")}   # claves "_nota" son comentarios
     return _merge(DEFAULT, data)
 
@@ -131,12 +131,12 @@ if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "ver"
     if cmd == "init":
         nuevos = iniciar()
-        print(f"[postula] carpeta de datos: {HOME}")
-        print("[postula] creados: " + (", ".join(nuevos) if nuevos else "nada (ya existía todo)"))
+        print(f"[doppelganger] carpeta de datos: {HOME}")
+        print("[doppelganger] creados: " + (", ".join(nuevos) if nuevos else "nada (ya existía todo)"))
     elif cmd == "ruta":
         print(HOME)
     elif cmd == "estado":
         f = estado()
-        print("[postula] listo para postular" if not f else "[postula] falta:\n  - " + "\n  - ".join(f))
+        print("[doppelganger] listo para postular" if not f else "[doppelganger] falta:\n  - " + "\n  - ".join(f))
     else:
         print(json.dumps(cargar(), ensure_ascii=False, indent=2))

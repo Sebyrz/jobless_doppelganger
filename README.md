@@ -1,4 +1,6 @@
-# Postula
+# jobless_doppelganger
+
+*Tu doble sin pega. Postula por ti mientras tú haces otra cosa.*
 
 **Tu agente de postulación en Claude. Aprende tu historia y tu forma de escribir, encuentra los
 trabajos remotos que calzan contigo y llena los formularios por ti. Tú solo dices "envía".**
@@ -12,7 +14,7 @@ avisos que en letra chica dicen "solo EE. UU.", escribir por quinta vez en la se
 interesa una empresa, copiar tu experiencia en un formulario que no lee tu CV. Cuarenta minutos por
 postulación, y la mayoría no contesta.
 
-Postula hace ese trabajo contigo dentro de Claude:
+Tu doppelganger hace ese trabajo contigo dentro de Claude:
 
 | | Qué hace | Lo que te ahorras |
 |---|---|---|
@@ -43,7 +45,7 @@ cuenta, y descarta los "remote" que en la descripción exigen vivir en EE. UU.
 **Nada sale sin tu OK.** Ves cada respuesta tal como se va a enviar. Un sí por tanda. Contraseñas,
 códigos y CAPTCHAs los pones tú. En LinkedIn, el botón final lo aprietas tú.
 
-**Tus datos no salen de tu computador.** Todo lo tuyo vive en `~/.postula`. El plugin no trae ni
+**Tus datos no salen de tu computador.** Todo lo tuyo vive en `~/.doppelganger`. El plugin no trae ni
 manda datos personales a ningún servidor propio.
 
 ## Cómo se ve
@@ -69,18 +71,18 @@ la extensión **Claude in Chrome** (planes pagos de Claude). Python 3.9 o más (
 **Desde GitHub** (en Claude Code):
 
 ```
-/plugin marketplace add Sebyrz/postula
-/plugin install postula@postula
+/plugin marketplace add Sebyrz/jobless_doppelganger
+/plugin install jobless-doppelganger@jobless-doppelganger
 ```
 
 **Desde el zip:** descomprímelo donde quieras y, en Claude Code:
 
 ```
-/plugin marketplace add /ruta/a/postula
-/plugin install postula@postula
+/plugin marketplace add /ruta/a/jobless_doppelganger
+/plugin install jobless-doppelganger@jobless-doppelganger
 ```
 
-Después escribe **"empecemos con postula"** y sigue las instrucciones.
+Después escribe **"configura mi doppelganger"** y sigue las instrucciones.
 
 ## Lo que no hace
 
@@ -107,7 +109,7 @@ local se configuran en tu perfil.
 las apruebas una por una. Si un formulario te pide declarar que no usaste IA, el agente no lo firma
 por ti.
 
-**¿Qué pasa con mis datos?** Quedan en `~/.postula` en tu computador. Las búsquedas de avisos van a
+**¿Qué pasa con mis datos?** Quedan en `~/.doppelganger` en tu computador. Las búsquedas de avisos van a
 las APIs públicas de cada bolsa, sin datos tuyos.
 
 ## Para quien quiera mirar el código
@@ -115,7 +117,7 @@ las APIs públicas de cada bolsa, sin datos tuyos.
 ```
 skills/        empezar · perfil · mejorar-cv · radar · postular (+ guía de formularios)
 scripts/       radar, fuentes, criterio, guardia (revisor de respuestas), cola y registro
-plantillas/    lo que se copia a ~/.postula la primera vez
+plantillas/    lo que se copia a ~/.doppelganger la primera vez
 tests/         python3 -m unittest discover -s tests
 ```
 

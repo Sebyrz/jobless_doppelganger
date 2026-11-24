@@ -21,7 +21,7 @@ from pathlib import Path
 import config, fuentes
 
 CACHE = config.CACHE / "links_directos.json"
-UA = {"User-Agent": "Mozilla/5.0 (postula: radar personal de empleo)", "Accept": "application/json"}
+UA = {"User-Agent": "Mozilla/5.0 (jobless_doppelganger: radar personal de empleo)", "Accept": "application/json"}
 RUIDO = {"the", "and", "of", "senior", "sr", "remote", "latam", "only", "job", "id", "for", "to", "in", "a"}
 
 

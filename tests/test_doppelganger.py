@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pruebas de postula. Sin red y sin modelo: solo las reglas, con la config de ejemplo.
+"""Pruebas de jobless_doppelganger. Sin red y sin modelo: solo las reglas, con la config de ejemplo.
 
     python3 -m unittest discover -s tests -v
 """
@@ -7,8 +7,8 @@ import json, os, shutil, sys, tempfile, time, unittest
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent.parent
-TMP = tempfile.mkdtemp(prefix="postula-test-")
-os.environ["POSTULA_HOME"] = TMP
+TMP = tempfile.mkdtemp(prefix="doppelganger-test-")
+os.environ["DOPPELGANGER_HOME"] = TMP
 shutil.copy(RAIZ / "plantillas" / "config.ejemplo.json", Path(TMP) / "config.json")
 (Path(TMP) / "perfil.md").write_text("# Perfil\n- 4 años en producto, 7 en tecnología.\n- Subí la conversión 23% en Acme.\n"
                                      "## Educación\n- Ingeniería comercial, sin terminar.\n", encoding="utf-8")
