@@ -21,7 +21,7 @@ Your doppelganger does that work with you inside Claude:
 | **2. Profile** | Reads your CV, your LinkedIn and your past applications. Builds your profile (facts only, each with its source) and learns how you write. No CV? It asks for one or builds it with you. | Explaining who you are to every form. |
 | **3. Improve your CV** | Compares your CV and LinkedIn with what real listings for your role ask for, and tells you what to change, why, and how it reads, ready to paste. | Guessing why nobody calls. |
 | **4. Radar** | Sweeps GetOnBoard, Himalayas, Remotive, RemoteOK, Working Nomads and the job boards of 350 companies that hire remotely. Filters by your role, salary floor and country. Ranks by fit. | Hours of scrolling and listings that were never for you. |
-| **5. Apply** | Builds batches of 5–10 listings, writes every answer in your voice, shows you everything at once, and with your OK fills and submits the forms (GetOnBoard, Greenhouse, Ashby, Lever, Workable). | The forty minutes per application. |
+| **5. Apply** | Builds batches of 5–10 listings, writes every answer in your voice, shows you everything at once, and with your OK (or in auto mode) fills and submits the forms (GetOnBoard, Greenhouse, Ashby, Lever, Workable). | The forty minutes per application. |
 
 ## What makes it different
 
@@ -39,8 +39,12 @@ company: the number, the client, the project. "You need X; I did Y" beats "I'm a
 **It searches where you can actually apply.** Listings with a direct application form and no account
 come first, and "remote" jobs that require living in the US get filtered out.
 
-**Nothing goes out without your OK.** You see every answer exactly as it will be sent. One yes per
-batch. Passwords, codes and CAPTCHAs are yours to enter. On LinkedIn, you press the final button.
+**You choose how much to look at.** By default you see every answer exactly as it will be sent and
+give one yes per batch. If you'd rather not look, turn on auto mode (`"envio": "automatico"` in your
+config): say "apply" and it sends only what clears every filter (high fit, direct form, no question
+that only you can answer, up to 15 a day). Anything doubtful stays as a draft, and at the end it shows
+you what it sent, answer by answer. In both modes, passwords, codes and CAPTCHAs are yours to enter,
+and on LinkedIn you press the final button.
 
 **Your data stays on your computer.** Everything about you lives in `~/.doppelganger`. The plugin has no
 server of its own and sends your data nowhere.
@@ -70,7 +74,8 @@ the docs and script messages are in Spanish.
 ## What it won't do
 
 - Invent experience, years, degrees or results.
-- Send anything without your yes in the chat.
+- Send anything unless you ask in the chat: in normal mode, one yes per batch; in auto mode, your
+  "apply" in that session. A scheduled run without you prepares the batch and sends nothing.
 - Automate LinkedIn: it reads with you present and you press submit. LinkedIn bans bots, and your
   account is worth more than ten applications.
 - Create accounts or type your passwords.

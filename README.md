@@ -22,7 +22,7 @@ Tu doppelganger hace ese trabajo contigo dentro de Claude:
 | **2. Perfil** | Lee tu CV, tu LinkedIn y tus postulaciones pasadas. Arma tu perfil (solo hechos, con su fuente) y aprende cómo escribes tú. Si no tienes CV, te lo pide o lo arma contigo. | Explicarle a cada formulario quién eres. |
 | **3. Mejorar CV** | Compara tu CV y tu LinkedIn con lo que piden los avisos reales de tu rol y te dice qué cambiar, por qué y cómo queda, listo para pegar. | Adivinar por qué no te llaman. |
 | **4. Radar** | Barre GetOnBoard, Himalayas, Remotive, RemoteOK, Working Nomads y las bolsas de 350 empresas que contratan remoto. Filtra por tu rol, tu piso de sueldo y tu país. Ordena por calce. | Horas de scroll y avisos que no eran para ti. |
-| **5. Postular** | Arma tandas de 5 a 10 avisos, escribe cada respuesta con tu voz, te muestra todo junto, y con tu OK llena y envía los formularios (GetOnBoard, Greenhouse, Ashby, Lever, Workable). | Los 40 minutos por postulación. |
+| **5. Postular** | Arma tandas de 5 a 10 avisos, escribe cada respuesta con tu voz, te muestra todo junto, y con tu OK (o en modo automático) llena y envía los formularios (GetOnBoard, Greenhouse, Ashby, Lever, Workable). | Los 40 minutos por postulación. |
 
 ## Lo que lo hace distinto
 
@@ -42,8 +42,12 @@ proactivo y orientado a resultados".
 **Busca donde se puede postular de verdad.** Prioriza los avisos con formulario directo, sin crear
 cuenta, y descarta los "remote" que en la descripción exigen vivir en EE. UU.
 
-**Nada sale sin tu OK.** Ves cada respuesta tal como se va a enviar. Un sí por tanda. Contraseñas,
-códigos y CAPTCHAs los pones tú. En LinkedIn, el botón final lo aprietas tú.
+**Tú eliges cuánto mirar.** Por defecto ves cada respuesta tal como se va a enviar y das un sí por
+tanda. Si prefieres no mirar, activa el modo automático (`"envio": "automatico"` en tu config): le
+dices "postula" y envía solo lo que pasa todos los filtros (calce alto, formulario directo, ninguna
+pregunta que te toque a ti, hasta 15 al día). Lo dudoso queda en borrador y al final te muestra qué
+mandó, con cada respuesta. En los dos modos, contraseñas, códigos y CAPTCHAs los pones tú, y en
+LinkedIn el botón final lo aprietas tú.
 
 **Tus datos no salen de tu computador.** Todo lo tuyo vive en `~/.doppelganger`. El plugin no trae ni
 manda datos personales a ningún servidor propio.
@@ -87,7 +91,8 @@ Después escribe **"configura mi doppelganger"** y sigue las instrucciones.
 ## Lo que no hace
 
 - No inventa experiencia, años, títulos ni resultados.
-- No envía nada sin tu sí en el chat.
+- No envía nada sin que se lo pidas en el chat: en modo normal, un sí por tanda; en automático, tu
+  "postula" de esa sesión. Una corrida programada sin ti deja la tanda lista y no envía.
 - No automatiza LinkedIn: lee contigo presente y el envío final es tuyo. LinkedIn prohíbe los bots
   y tu cuenta vale más que diez postulaciones.
 - No crea cuentas por ti ni escribe tus contraseñas.

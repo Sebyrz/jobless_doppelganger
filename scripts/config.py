@@ -66,6 +66,14 @@ DEFAULT: dict = {
                             "sales", "technical-support", "machine-learning-ai", "design-ux", "data-science-analytics", "hr",
                             "digital-marketing", "other"],
 
+    # cómo se envía
+    # "revisar": te muestra la tanda completa y espera tu sí (por defecto).
+    # "automatico": cuando le pides postular, envía sin mostrarte cada respuesta, solo lo que pasa
+    #   todos los filtros de abajo; lo dudoso queda en borrador y te lo muestra al final.
+    "envio": "revisar",
+    "auto_max_dia": 15,             # tope de envíos automáticos por día
+    "auto_puntaje_min": 70,         # bajo este puntaje, aunque sea match, no se envía solo
+
     # límites
     "max_por_tanda": 10,
     "linkedin_max_dia": 10,

@@ -127,6 +127,43 @@ class Radar(unittest.TestCase):
                                             radar.hechos()))
 
 
+class Automatico(unittest.TestCase):
+    def fila(self, **kw):
+        base = {"veredicto": "match", "puntaje": 85, "source": "ats", "url": "https://jobs.ashbyhq.com/acme/1",
+                "apply_url": "https://jobs.ashbyhq.com/acme/1/application", "title": "Product Manager", "company": "Acme",
+                "pedir": 4000, "company_country": "", "lang": "en"}
+        base.update(kw)
+        return base
+
+    def test_apagado_por_defecto(self):
+        self.assertEqual(config.cargar()["envio"], "revisar")
+
+    def test_filtros(self):
+        c = config.cargar()
+        self.assertEqual(cola.por_que_no_auto(self.fila(), c), "")
+        self.assertIn("revisar", cola.por_que_no_auto(self.fila(veredicto="revisar"), c))
+        self.assertIn("puntaje", cola.por_que_no_auto(self.fila(puntaje=50), c))
+        self.assertIn("LinkedIn", cola.por_que_no_auto(self.fila(source="linkedin", url="https://www.linkedin.com/jobs/view/1/"), c))
+        self.assertIn("LinkedIn", cola.por_que_no_auto(self.fila(easy_apply=True), c))
+        self.assertIn("cuenta", cola.por_que_no_auto(self.fila(source="himalayas", apply_url=None), c))
+        self.assertEqual(cola.por_que_no_auto(self.fila(source="getonbrd", apply_url=None), c), "")
+        self.assertIn("piso", cola.por_que_no_auto(self.fila(pedir=100), c))
+
+    def test_tope_diario(self):
+        tope = config.cargar()["auto_max_dia"]
+        filas = [self.fila(url=f"https://jobs.ashbyhq.com/acme/{i}") for i in range(tope + 3)]
+        si, no, _ = cola.elegibles(filas)
+        self.assertEqual(len(si), tope)
+        cola.marcar("https://jobs.ashbyhq.com/acme/x", "submitted", "PM", "Acme", modo="auto",
+                    respuestas=[{"q": "Why?", "a": "Porque sí."}])
+        self.assertEqual(cola.auto_hoy(), 1)
+        si, no, _ = cola.elegibles(filas)
+        self.assertEqual(len(si), tope - 1)
+        self.assertTrue(any("tope" in why for _, why in no))
+        ultimo = json.loads(config.POSTULADOS.read_text(encoding="utf-8").splitlines()[-1])
+        self.assertEqual(ultimo["respuestas"][0]["a"], "Porque sí.")
+
+
 class Guardia(unittest.TestCase):
     def test_limpia(self):
         r = guardia.revisar("Subí la conversión 23% en Acme; hoy tengo 4 años en producto.", "why")

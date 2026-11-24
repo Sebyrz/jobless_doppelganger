@@ -14,6 +14,8 @@ postulado (todas las fuentes).
 Estados de `marcar`: submitted · descartado · entrevista · rechazado · sin_respuesta · oferta
                      falta_dato · borrador (estos dos vuelven a aparecer en el radar)
     python3 cola.py resumen      # cuántas enviadas, por semana y por estado
+    python3 cola.py elegibles    # modo automático: qué avisos se pueden enviar solos hoy (y cuántos quedan)
+    python3 cola.py marcar ... --modo auto --respuestas resp.json   # guarda lo que se envió, para auditar
 """
 from __future__ import annotations
 import argparse, datetime, json, sys, time
@@ -51,12 +53,54 @@ def agregar(fuente, url, titulo, empresa, ubicacion="", lo=None, hi=None, desc="
     return True, f"nivel {nivel}"
 
 
-def marcar(url, estado, titulo="", empresa="", nota="") -> None:
+def marcar(url, estado, titulo="", empresa="", nota="", modo="", respuestas=None) -> None:
     rec = {"url": url, "title": titulo, "company": empresa, "status": estado, "nota": nota,
            "ts": datetime.datetime.now().isoformat(timespec="seconds")}
+    if modo:
+        rec["modo"] = modo
+    if respuestas:
+        rec["respuestas"] = respuestas   # [{"q": ..., "a": ...}] tal como se enviaron
     LOG.parent.mkdir(parents=True, exist_ok=True)
     with LOG.open("a", encoding="utf-8") as f:
         f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+
+
+def auto_hoy(rows: list[dict] | None = None) -> int:
+    """Envíos automáticos de hoy (para el tope diario)."""
+    hoy = datetime.date.today().isoformat()
+    return sum(1 for r in (rows if rows is not None else _rows(LOG))
+               if r.get("modo") == "auto" and r.get("status") == "submitted" and r.get("ts", "")[:10] == hoy)
+
+
+def por_que_no_auto(r: dict, c: dict) -> str:
+    """Motivo por el que un aviso de la cola NO se envía solo ('' si puede)."""
+    if r.get("veredicto") != "match":
+        return "por revisar: lo decides tú"
+    if (r.get("puntaje") or 0) < c["auto_puntaje_min"]:
+        return f"puntaje {r.get('puntaje')} bajo {c['auto_puntaje_min']}"
+    if r.get("source") == "linkedin" or "linkedin.com" in (r.get("url") or "") or r.get("easy_apply"):
+        return "LinkedIn: el envío final es tuyo"
+    if not (r.get("apply_url") or r.get("source") == "getonbrd"):
+        return "sin formulario directo (pediría crear cuenta)"
+    if r.get("pedir") and r["pedir"] < criterio.piso(r):
+        return "lo que se pediría queda bajo tu piso"
+    return ""
+
+
+def elegibles(cola: list[dict] | None = None) -> tuple[list[dict], list[tuple[dict, str]], int]:
+    """Modo automático: (los que se envían hoy, [(aviso, por qué no)], cupo que queda)."""
+    c = config.cargar()
+    cupo = max(0, int(c["auto_max_dia"]) - auto_hoy())
+    si, no = [], []
+    for r in (cola if cola is not None else _rows(COLA)):
+        why = por_que_no_auto(r, c)
+        if why:
+            no.append((r, why))
+        elif len(si) < cupo:
+            si.append(r)
+        else:
+            no.append((r, f"tope diario de {c['auto_max_dia']} envíos automáticos"))
+    return si, no, cupo - len(si)
 
 
 def resumen() -> None:
@@ -71,6 +115,9 @@ def resumen() -> None:
             por_semana[sem] = por_semana.get(sem, 0) + 1
     print("[registro] por estado: " + ", ".join(f"{k} {v}" for k, v in sorted(por_estado.items(), key=lambda x: -x[1])))
     print("[registro] enviadas por semana: " + ", ".join(f"{k}: {v}" for k, v in sorted(por_semana.items())))
+    auto = sum(1 for r in rows if r.get("modo") == "auto" and r["status"] == "submitted")
+    if auto:
+        print(f"[registro] enviadas en modo automático: {auto} (hoy {auto_hoy(rows)})")
 
 
 def main():
@@ -85,6 +132,9 @@ def main():
     m = sub.add_parser("marcar")
     m.add_argument("--url", required=True); m.add_argument("--estado", required=True)
     m.add_argument("--titulo", default=""); m.add_argument("--empresa", default=""); m.add_argument("--nota", default="")
+    m.add_argument("--modo", default="", choices=["", "auto", "revisado"], help="auto = se envió sin que vieras la tanda")
+    m.add_argument("--respuestas", default="", help="JSON con [{q, a}] tal como se enviaron")
+    sub.add_parser("elegibles")
     v = sub.add_parser("ver")
     v.add_argument("--top", type=int, default=20); v.add_argument("--fuente", default="")
     sub.add_parser("resumen")
@@ -94,9 +144,23 @@ def main():
                           local=args.local)
         print(("[cola] agregado: " if ok else "[cola] no entra: ") + why)
     elif args.cmd == "marcar":
-        marcar(args.url, args.estado, args.titulo, args.empresa, args.nota); print(f"[registro] {args.estado}: {args.titulo} @ {args.empresa}")
+        resp = json.loads(Path(args.respuestas).read_text(encoding="utf-8")) if args.respuestas else None
+        marcar(args.url, args.estado, args.titulo, args.empresa, args.nota, args.modo, resp); print(f"[registro] {args.estado}: {args.titulo} @ {args.empresa}")
     elif args.cmd == "resumen":
         resumen()
+    elif args.cmd == "elegibles":
+        c = config.cargar()
+        if c["envio"] != "automatico":
+            print('[auto] el modo automático está apagado (config.json: "envio": "revisar")')
+        si, no, queda = elegibles()
+        print(f"[auto] {len(si)} se envían solos hoy · cupo que queda después: {queda}")
+        for r in si:
+            print(f"  ✓ {r['puntaje']:3} | {r['title'][:50]:50} | {r['company'][:20]:20} | {r.get('apply_url') or r['url']}")
+        motivos = {}
+        for _, why in no:
+            k = "puntaje bajo" if why.startswith("puntaje") else why.split(":")[0]
+            motivos[k] = motivos.get(k, 0) + 1
+        print("[auto] no van solos: " + ", ".join(f"{k} {v}" for k, v in sorted(motivos.items(), key=lambda x: -x[1])))
     else:
         rows = [r for r in _rows(COLA) if not args.fuente or r["source"] == args.fuente][:args.top]
         for r in rows:
