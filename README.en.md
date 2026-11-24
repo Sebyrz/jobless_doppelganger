@@ -18,7 +18,7 @@ Postula does that work with you inside Claude:
 | **1. Start** | Creates your private data folder, connects Claude to your Chrome, and gets you signed in to GetOnBoard and LinkedIn. | Setup. It takes 10 minutes. |
 | **2. Profile** | Reads your CV, your LinkedIn and your past applications. Builds your profile (facts only, each with its source) and learns how you write. No CV? It asks for one or builds it with you. | Explaining who you are to every form. |
 | **3. Improve your CV** | Compares your CV and LinkedIn with what real listings for your role ask for, and tells you what to change, why, and how it reads, ready to paste. | Guessing why nobody calls. |
-| **4. Radar** | Sweeps GetOnBoard, Himalayas, Remotive, RemoteOK, Working Nomads and the job boards of 400+ companies that hire remotely. Filters by your role, salary floor and country. Ranks by fit. | Hours of scrolling and listings that were never for you. |
+| **4. Radar** | Sweeps GetOnBoard, Himalayas, Remotive, RemoteOK, Working Nomads and the job boards of 350 companies that hire remotely. Filters by your role, salary floor and country. Ranks by fit. | Hours of scrolling and listings that were never for you. |
 | **5. Apply** | Builds batches of 5–10 listings, writes every answer in your voice, shows you everything at once, and with your OK fills and submits the forms (GetOnBoard, Greenhouse, Ashby, Lever, Workable). | The forty minutes per application. |
 
 ## What makes it different

@@ -19,7 +19,7 @@ Postula hace ese trabajo contigo dentro de Claude:
 | **1. Empezar** | Crea tu carpeta privada, conecta Claude a tu Chrome y te deja con la sesión abierta en GetOnBoard y LinkedIn. | Configurar cosas. Son 10 minutos. |
 | **2. Perfil** | Lee tu CV, tu LinkedIn y tus postulaciones pasadas. Arma tu perfil (solo hechos, con su fuente) y aprende cómo escribes tú. Si no tienes CV, te lo pide o lo arma contigo. | Explicarle a cada formulario quién eres. |
 | **3. Mejorar CV** | Compara tu CV y tu LinkedIn con lo que piden los avisos reales de tu rol y te dice qué cambiar, por qué y cómo queda, listo para pegar. | Adivinar por qué no te llaman. |
-| **4. Radar** | Barre GetOnBoard, Himalayas, Remotive, RemoteOK, Working Nomads y las bolsas de más de 400 empresas que contratan remoto. Filtra por tu rol, tu piso de sueldo y tu país. Ordena por calce. | Horas de scroll y avisos que no eran para ti. |
+| **4. Radar** | Barre GetOnBoard, Himalayas, Remotive, RemoteOK, Working Nomads y las bolsas de 350 empresas que contratan remoto. Filtra por tu rol, tu piso de sueldo y tu país. Ordena por calce. | Horas de scroll y avisos que no eran para ti. |
 | **5. Postular** | Arma tandas de 5 a 10 avisos, escribe cada respuesta con tu voz, te muestra todo junto, y con tu OK llena y envía los formularios (GetOnBoard, Greenhouse, Ashby, Lever, Workable). | Los 40 minutos por postulación. |
 
 ## Lo que lo hace distinto
