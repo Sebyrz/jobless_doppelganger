@@ -1,0 +1,19 @@
+{
+  "_nota": "Lo llena el skill perfil contigo. Claves con _ son comentarios. Ver config.ejemplo.json.",
+  "pais": "",
+  "pais_iso": "",
+  "pais_getonbrd": "",
+  "ciudades": [],
+  "solo_remoto": true,
+  "idiomas": ["spanish", "english"],
+  "idioma_local": "es",
+  "piso_usd_mes": 0,
+  "pedir_usd_mes": 0,
+  "moneda_local": null,
+  "roles": {"A": [], "B": [], "C": [], "NO": []},
+  "excluir_junior": true,
+  "anos_en_rol": 0,
+  "industrias": [],
+  "palabras_clave": [],
+  "busquedas": []
+}

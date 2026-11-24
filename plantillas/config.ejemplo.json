@@ -1,0 +1,24 @@
+{
+  "_nota": "Ejemplo: product manager en Colombia, 4 años en producto, busca remoto sobre 3.000 USD.",
+  "pais": "Colombia",
+  "pais_iso": "CO",
+  "pais_getonbrd": "colombia",
+  "ciudades": ["bogota", "bogotá", "medellin", "medellín"],
+  "solo_remoto": true,
+  "idiomas": ["spanish", "english"],
+  "idioma_local": "es",
+  "piso_usd_mes": 3000,
+  "pedir_usd_mes": 3800,
+  "moneda_local": {"codigo": "COP", "por_usd": 4000, "piso": 9000000, "pedir": 11000000, "etiqueta": "brutos"},
+  "roles": {
+    "A": ["product manager", "product owner", "product lead", "head of product", "product operations", "gerente de producto"],
+    "B": ["program manager", "project manager", "implementation", "onboarding", "customer success", "business analyst", "chief of staff"],
+    "C": ["solutions engineer", "sales engineer", "forward deployed"],
+    "NO": ["developer", "software engineer", "designer", "recruiter", "account executive", "sdr", "accountant"]
+  },
+  "excluir_junior": true,
+  "anos_en_rol": 4,
+  "industrias": ["fintech", "payments", "e-commerce", "marketplace", "saas", "b2b"],
+  "palabras_clave": ["ai", "llm", "automation", "api", "sql", "analytics"],
+  "busquedas": ["product manager", "product owner", "program manager", "implementation", "customer success"]
+}

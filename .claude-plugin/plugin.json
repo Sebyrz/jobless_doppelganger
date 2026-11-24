@@ -1,0 +1,10 @@
+{
+  "name": "postula",
+  "version": "0.1.0",
+  "description": "Agente de postulación a trabajos remotos en Claude: aprende tu historia y tu forma de escribir, busca avisos que calzan, mejora tu CV y llena formularios con tu voz. Nada sale sin tu OK.",
+  "author": {
+    "name": "Sebyrz"
+  },
+  "license": "MIT",
+  "keywords": ["empleo", "jobs", "postulaciones", "job-search", "cv", "remote", "getonboard", "greenhouse", "ashby", "lever"]
+}

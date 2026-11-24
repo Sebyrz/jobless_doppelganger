@@ -1,0 +1,16 @@
+{
+  "name": "postula",
+  "owner": {
+    "name": "Sebyrz"
+  },
+  "metadata": {
+    "description": "Postula: agente de postulación a trabajos remotos para Claude Code."
+  },
+  "plugins": [
+    {
+      "name": "postula",
+      "source": "./",
+      "description": "Agente de postulación a trabajos remotos: perfil con tu voz, radar de avisos, mejora de CV y postulación por tandas con tu OK."
+    }
+  ]
+}
