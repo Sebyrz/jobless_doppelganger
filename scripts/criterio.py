@@ -96,10 +96,17 @@ def sueldo_ok(job: dict) -> tuple[bool, str]:
     return True, f"{int(top)} USD" if top else "sin sueldo publicado"
 
 
+def tope_creible(top) -> bool:
+    """Un tope publicado de más de 4 veces lo que pides casi siempre es un sueldo mal leído (anual tomado
+    como mensual, otra moneda). Sirve para ordenar la cola, pero no se escribe en un formulario."""
+    ask = int(C["pedir_usd_mes"] or 0)
+    return not ask or float(top) <= ask * 4
+
+
 def pedir(job: dict) -> int:
     """USD brutos al mes. Con rango publicado: el tope (si la config lo dice), nunca bajo el piso."""
     top, p = _top(job), piso(job)
-    if top and C["pedir_tope_si_publican"]:
+    if top and C["pedir_tope_si_publican"] and tope_creible(top):
         return max(int(top), p)
     if local(job):
         return _usd(C["moneda_local"]["pedir"])

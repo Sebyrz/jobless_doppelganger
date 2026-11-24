@@ -88,14 +88,30 @@ def mensual(lo, hi, moneda="USD", periodo="annual"):
     return conv(lo), conv(hi)
 
 
-def sueldo_texto(s: str):
-    """'$120k - $150k' · '$90,000 - $110,000' · 'USD 4000-6000/month' -> USD/mes. Por hora: no se compara."""
+_ANUAL = re.compile(r"year|annual|annum|/ ?yr|\byr\b|\bp\.?a\.?\b|anual|al año|por año", re.I)
+_MENSUAL = re.compile(r"month|/ ?mo\b|mensual|al mes|por mes|\bmes\b", re.I)
+
+
+def _moneda(s: str) -> str:
+    for rx, cod in ((r"€|\beur", "EUR"), (r"£|\bgbp", "GBP"), (r"\bcad\b|c\$", "CAD"), (r"\baud\b|a\$", "AUD")):
+        if re.search(rx, s):
+            return cod
+    return "USD"
+
+
+def sueldo_texto(s: str, contexto: str = ""):
+    """'$120k - $150k' · '$90,000 - $110,000' · 'USD 4000-6000/month' -> USD/mes. Por hora: no se compara.
+    `contexto` es el texto de alrededor: solo se usa para saber si es al año o al mes y en qué moneda.
+    Si el monto no dice el período y cae donde puede ser cualquiera de los dos, no se adivina: (None, None)."""
     s = (s or "").lower()
-    if not s or re.search(r"/ ?h|hour|hora", s):
+    todo = s + " " + (contexto or "").lower()
+    if not s or re.search(r"/ ?h\b|/ ?hr|hour|hora", todo):
         return None, None
     nums = []
-    for m in re.finditer(r"(\d[\d.,]*)\s*(k)?", s):
-        raw, k = m.group(1), m.group(2)
+    for m in re.finditer(r"(\d[\d.,]*)\s*(k\b)?", s):
+        raw, k = m.group(1).rstrip(".,"), m.group(2)
+        if not raw or (k and raw == "401"):   # "401k" es el plan de retiro, no un sueldo
+            continue
         v = float(raw.replace(",", ".")) if k else float(re.sub(r"[.,]", "", raw) or 0)
         v = v * 1000 if k else v
         if v >= 500:
@@ -103,8 +119,17 @@ def sueldo_texto(s: str):
     if not nums:
         return None, None
     lo, hi = min(nums), max(nums)
-    periodo = "monthly" if (re.search(r"month|mes|/mo", s) or hi < 20000) else "annual"
-    return mensual(lo, hi, "USD", periodo)
+    if _ANUAL.search(todo):
+        periodo = "annual"
+    elif _MENSUAL.search(todo):
+        periodo = "monthly"
+    elif hi >= 20000:
+        periodo = "annual"
+    elif hi < 10000:
+        periodo = "monthly"
+    else:   # entre 10 y 20 mil sin período: puede ser un sueldo anual bajo o uno mensual alto
+        return None, None
+    return mensual(lo, hi, _moneda(todo), periodo)
 
 
 def _epoch(s) -> float | None:

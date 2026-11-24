@@ -45,6 +45,9 @@ DEFAULT: dict = {
     "pedir_tope_si_publican": True,  # con rango publicado, pides el tope
     # empresas de tu país que publican en tu idioma suelen pagar en moneda local:
     # {"codigo": "CLP", "por_usd": 950, "piso": 2000000, "pedir": 2500000, "etiqueta": "líquidos"}
+    # OJO: la etiqueta solo cambia el texto. En un campo numérico en USD el monto se convierte tal cual,
+    # sin pasar de líquido a bruto (eso depende de los descuentos de cada país). Si pides en líquido,
+    # pon en "piso" y "pedir" el bruto equivalente, o el número en USD va a quedar corto.
     "moneda_local": None,
 
     # qué roles buscas (frases en minúscula; se buscan dentro del título del aviso)

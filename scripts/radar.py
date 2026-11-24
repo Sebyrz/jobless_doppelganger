@@ -16,7 +16,7 @@ veredicto:
     revisar  vale una mirada tuya (rol discutible, o el aviso no dice desde qué países).
 """
 from __future__ import annotations
-import argparse, datetime, json, os, re, sys
+import argparse, datetime, json, os, re, sys, urllib.parse
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
@@ -46,21 +46,52 @@ def hechos() -> list[dict]:
     return [json.loads(l) for l in LOG.read_text(encoding="utf-8").splitlines() if l.strip()]
 
 
+_COLA_URL = re.compile(r"/(apply|application|thanks|confirmation)$", re.I)
+# palabras que muchas empresas comparten: no sirven para decir que dos nombres son la misma empresa
+EMPRESA_GENERICA = {"ai", "labs", "lab", "inc", "llc", "ltd", "group", "grupo", "the", "co", "io", "hq", "app", "tech",
+                    "technologies", "technology", "software", "global", "latam", "solutions", "systems", "digital",
+                    "company", "corp", "spa", "sa", "data", "cloud", "health", "capital", "studio", "studios"}
+
+
+def clave_url(url: str) -> str:
+    """Lo que identifica a UN aviso. El último tramo de la URL no sirve: en Lever y Workable es 'apply',
+    en Ashby 'application', y en el sitio propio de una empresa 'careers' (el id va en ?gh_jid=)."""
+    u = urllib.parse.urlsplit((url or "").strip())
+    host = u.netloc.lower()
+    host = host[4:] if host.startswith("www.") else host
+    if "getonbrd" in host:   # los logs viejos guardan /jobs/<categoría>/<slug>, la API /jobs/<slug>
+        return "getonbrd:" + gob.slug(url)
+    path = _COLA_URL.sub("", u.path.rstrip("/"))
+    gh = urllib.parse.parse_qs(u.query).get("gh_jid")
+    return host + path + (f"?gh_jid={gh[0]}" if gh else "")
+
+
+def misma_empresa(a: str, b: str) -> bool:
+    """'Acme' = 'Acme Inc' = 'acme'; 'Scale AI' = 'scaleai'. 'Scale AI' no es 'Harvey AI'."""
+    a, b = _norm(a), _norm(b)
+    if not a or not b:
+        return False
+    ja, jb = a.replace(" ", ""), b.replace(" ", "")
+    if ja == jb or (min(len(ja), len(jb)) >= 5 and (ja in jb or jb in ja)):
+        return True
+    ta, tb = set(a.split()) - EMPRESA_GENERICA, set(b.split()) - EMPRESA_GENERICA
+    return bool(ta) and bool(tb) and (ta <= tb or tb <= ta)
+
+
 def ya_postulado(job: dict, done: list[dict]) -> bool:
-    """Misma regla que el driver: misma URL, o título muy parecido (Jaccard) + misma empresa."""
-    s = gob.slug(job["url"])
-    nt, nc = _tokens(job["title"]), _norm(job["company"])
+    """Mismo aviso (misma URL sin el tramo de postular), o título muy parecido (Jaccard) + misma empresa."""
+    claves = {clave_url(u) for u in (job.get("url"), job.get("apply_url")) if u}   # se registra con cualquiera de las dos
+    nt = _tokens(job["title"])
     for r in done:
         if r.get("status") in REINTENTABLES:
             continue
-        if r.get("url") and gob.slug(r["url"]) == s:
+        if r.get("url") and clave_url(r["url"]) in claves:
             return True
         rt = _tokens(r.get("title", ""))
         if not nt or not rt:
             continue
         jac = len(nt & rt) / len(nt | rt)
-        rc = _norm(r.get("company", ""))
-        if jac >= 0.6 and nc and rc and (nc in rc or rc in nc or set(nc.split()) & set(rc.split())):
+        if jac >= 0.6 and misma_empresa(job["company"], r.get("company", "")):
             return True
     return False
 

@@ -19,6 +19,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 import config, fuentes
+import directo
 from directo import _get
 
 C = config.cargar()
@@ -150,19 +151,63 @@ def _sueldo(j):
                                "monthly" if "month" in (sr.get("interval") or "") else "annual")
     if j.get("comp"):
         return fuentes.sueldo_texto(j["comp"])
-    m = re.search(r"\$\s?\d[\d,.]*\s?k?\s?(?:-|–|to)\s?\$?\s?\d[\d,.]*\s?k?(?:\s?(?:usd|per year|/year|annually|per month|/month))?",
-                  j["desc"], re.I)
-    return fuentes.sueldo_texto(m.group(0)) if m else (None, None)
+    return sueldo_en_texto(j["desc"])
+
+
+_RANGO = re.compile(r"\$\s?\d[\d,.]*\s?k?\s?(?:-|–|—|to)\s?\$?\s?\d[\d,.]*\s?k?", re.I)
+_ES_SUELDO = re.compile(r"salary|compensation|pay range|base pay|base range|pay band|pay scale|sueldo|salario|remuneraci|"
+                        r"\brenta\b|\bote\b|per year|/ ?year|a year|annual|per month|/ ?month|monthly", re.I)
+_NO_ES_SUELDO = re.compile(r"stipend|bonus|budget|revenue|\barr\b|\bacv\b|funding|raised|accounts?\b|deals?\b|allowance|"
+                           r"reimburs|equity|valuation|contracts?\b|customers?\b|clients?\b", re.I)
+
+
+def sueldo_en_texto(desc: str):
+    """Sueldo publicado dentro de una descripción. Un rango en dólares vale solo si su frase habla de
+    sueldo y lo que viene justo antes no habla de otra cosa (bono, presupuesto, cuentas, ACV, ingresos)."""
+    desc = desc or ""
+    for m in _RANGO.finditer(desc):
+        ini = desc.rfind(". ", 0, m.start()) + 1
+        fin = desc.find(". ", m.end())
+        frase = desc[ini:fin if fin != -1 else len(desc)]
+        antes = desc[max(m.start() - 30, ini):m.start()]   # lo que viene justo antes, dentro de la misma frase
+        if not _ES_SUELDO.search(frase) or _NO_ES_SUELDO.search(antes):
+            continue
+        lo, hi = fuentes.sueldo_texto(m.group(0), desc[m.end():m.end() + 30] + " " + antes)
+        if lo or hi:
+            return lo, hi
+    return None, None
+
+
+def salud(con: dict, total: int, vivas: int) -> list[str]:
+    """Avisos cuando el barrido se ve roto. Una bolsa caída o que cambió su API se ve igual que una sin
+    avisos si nadie lo dice: acá se dice."""
+    out = []
+    for host, n in sorted(directo.FALLOS.items()):
+        if any(h in host for h in ("greenhouse", "ashby", "lever", "manatal")):
+            out.append(f"{n} llamadas a {host} fallaron (límite de llamadas, caída o cambio de API): faltan avisos de ahí")
+    for ats in ("greenhouse", "ashby", "lever"):
+        if total >= 20 and not con.get(ats):
+            out.append(f"{ats} no devolvió ningún aviso de {total} empresas: lo más probable es que su API cambió")
+    if total >= 20 and vivas < total * 0.25:
+        out.append(f"solo {vivas} de {total} empresas respondieron con avisos: revisa tu conexión antes de confiar en esta cola")
+    return out
 
 
 def fetch(empresas=EMPRESAS) -> list[dict]:
-    crudos = []
+    crudos, con, vivas = [], {"greenhouse": 0, "ashby": 0, "lever": 0, "manatal": 0}, 0
+    directo.FALLOS.clear()
     with cf.ThreadPoolExecutor(8) as ex:
-        for res in ex.map(lambda t: _gh(t) + _ashby(t) + _lever(t), empresas):
-            crudos += res
+        for gh, ash, lev in ex.map(lambda t: (_gh(t), _ashby(t), _lever(t)), empresas):
+            con["greenhouse"] += bool(gh); con["ashby"] += bool(ash); con["lever"] += bool(lev)
+            vivas += bool(gh or ash or lev)
+            crudos += gh + ash + lev
         for res in ex.map(_manatal, MANATAL):
+            con["manatal"] += bool(res)
             crudos += res
-    print(f"[tableros] {len(empresas)} empresas, {len(crudos)} avisos en total", file=sys.stderr)
+    print(f"[tableros] {len(empresas)} empresas en la lista, {vivas} con avisos hoy, {len(crudos)} avisos en total "
+          f"({', '.join(f'{k} {v}' for k, v in con.items())})", file=sys.stderr)
+    for aviso in salud(con, len(empresas), vivas):
+        print(f"[tableros] OJO: {aviso}", file=sys.stderr)
     out = []
     for j in crudos:
         loc, why = _lugar_ok(j)

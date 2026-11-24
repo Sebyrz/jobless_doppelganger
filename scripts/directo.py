@@ -15,33 +15,52 @@ Greenhouse además entrega las preguntas del formulario: `preguntas("able", "861
 Sirve para saber antes de abrirlo si pide algo que solo tú puedes contestar (certificado de notas, visa).
 """
 from __future__ import annotations
-import concurrent.futures as cf, json, re, sys, urllib.request
+import collections, concurrent.futures as cf, json, re, sys, urllib.error, urllib.parse, urllib.request
 from pathlib import Path
 
 import config, fuentes
 
-CACHE = config.CACHE / "links_directos.json"
+CACHE = config.CACHE / "links_directos_v2.json"   # v2: solo bolsas halladas por el nombre completo
 UA = {"User-Agent": "Mozilla/5.0 (jobless_doppelganger: radar personal de empleo)", "Accept": "application/json"}
 RUIDO = {"the", "and", "of", "senior", "sr", "remote", "latam", "only", "job", "id", "for", "to", "in", "a"}
 
 
+FALLOS: collections.Counter = collections.Counter()   # "dominio código" -> llamadas que fallaron por algo que no es "no existe"
+
+
 def _get(url: str, timeout=12):
+    """JSON de la URL, o None. Un 404 es una bolsa que no existe (normal: se prueban nombres). Todo lo
+    demás (429, 5xx, tiempo agotado, respuesta que no es JSON) se cuenta en FALLOS para poder avisarlo."""
+    dominio = ".".join(urllib.parse.urlsplit(url).netloc.split(".")[-2:])
     try:
         with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=timeout) as r:
             return json.loads(r.read())
-    except Exception:
+    except urllib.error.HTTPError as e:
+        if e.code not in (404, 410):
+            FALLOS[f"{dominio} ({e.code})"] += 1
+        return None
+    except Exception as e:
+        FALLOS[f"{dominio} ({type(e).__name__})"] += 1
         return None
 
 
-def toks(empresa: str) -> list[str]:
-    """Cómo puede llamarse la empresa en la URL de su bolsa: 'Customer.io' -> customerio, customer."""
+def _partes(empresa: str) -> list[str]:
     n = re.sub(r"\(.*?\)|,? (inc|llc|ltd|limited|corp|corporation|company|co|spa)\.?$", "", (empresa or "").lower()).strip()
-    base = re.sub(r"[^a-z0-9 ]", "", n)
-    partes = base.split()
-    out = {"".join(partes), "-".join(partes)}
-    if partes:
-        out.add(partes[0])
-    return sorted(t for t in out if len(t) > 2)
+    partes = re.sub(r"[^a-z0-9 ]", "", n).split()
+    return partes[1:] if len(partes) > 1 and partes[0] in ("the", "grupo") else partes
+
+
+def toks(empresa: str) -> list[str]:
+    """Cómo se llama la empresa en la URL de su bolsa, con el nombre completo: 'Scale AI' -> scaleai, scale-ai."""
+    partes = _partes(empresa)
+    return sorted(t for t in {"".join(partes), "-".join(partes)} if len(t) > 2)
+
+
+def toks_dudosos(empresa: str) -> list[str]:
+    """Solo la primera palabra de un nombre de varias ('Open English' -> open). Esa bolsa puede ser de OTRA
+    empresa: sirve para sugerir, nunca para enlazar un formulario sin que la persona lo confirme."""
+    partes = _partes(empresa)
+    return [partes[0]] if len(partes) > 1 and len(partes[0]) > 3 and partes[0] not in toks(empresa) else []
 
 
 def _pal(s: str) -> set[str]:
@@ -55,10 +74,13 @@ def _calza(pedido: str, hallado: str) -> bool:
     return min(len(a), len(b)) >= 2 and (a <= b or b <= a)
 
 
-def buscar(empresa: str, titulo: str) -> list[dict]:
-    """Todas las publicaciones de esa empresa que calzan con el título (suele haber una por país)."""
+def buscar(empresa: str, titulo: str, dudosos=False) -> list[dict]:
+    """Todas las publicaciones de esa empresa que calzan con el título (suele haber una por país).
+    Cada una trae `seguro`: False si la bolsa se encontró solo por la primera palabra del nombre
+    (`dudosos=True`), y entonces hay que confirmar que es esa empresa antes de mandarle un CV."""
     out = []
-    for t in toks(empresa):
+    seguros = toks(empresa)
+    for t in seguros + (toks_dudosos(empresa) if dudosos else []):
         d = _get(f"https://boards-api.greenhouse.io/v1/boards/{t}/jobs")
         for j in (d or {}).get("jobs", []):
             if _calza(titulo, j["title"]):
@@ -102,6 +124,8 @@ def buscar(empresa: str, titulo: str) -> list[dict]:
                             "lugar": (loc.get("name") or "") + (" (remote)" if loc.get("is_remote") else ""),
                             "url": j.get("url"), "id": j.get("id", "")})
         if out:
+            for h in out:
+                h["seguro"] = t in seguros
             break
     return out
 
@@ -164,11 +188,14 @@ def enlazar(filas: list[dict], tope=80) -> int:
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         sys.exit('uso: python3 directo.py "Empresa" "Título del aviso"')
-    hs = buscar(sys.argv[1], sys.argv[2])
+    hs = buscar(sys.argv[1], sys.argv[2], dudosos=True)
     for h in hs:
         print(f"{h['ats']:10} | {h['titulo'][:50]:50} | {h['lugar'][:40]:40} | {h['url']}")
     e = elegir(hs)
     print("->", e["url"] if e else "sin publicación que sirva desde tu país")
+    if e and not e["seguro"]:
+        print(f"   OJO: la bolsa '{e['tablero']}' se encontró solo por la primera palabra de \"{sys.argv[1]}\". "
+              "Abre el link y confirma que es esa empresa antes de postular.")
     if e and e["ats"] == "greenhouse":
         qs = preguntas(e["tablero"], e["id"])
         for q in qs:

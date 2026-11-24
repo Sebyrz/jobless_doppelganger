@@ -33,6 +33,10 @@ busca su formulario directo y muestra las preguntas (y si alguna la tiene que co
 
 ## 3. Mostrar
 
+Si la corrida imprimió líneas con `OJO` (una bolsa falló o no devolvió nada), díselo antes que
+nada: a esa cola le faltan avisos. Si `directo.py` avisa que la bolsa se encontró solo por la primera
+palabra del nombre, confirma con ella que es esa empresa antes de usar ese link.
+
 En el chat, las 10 a 15 primeras: puntaje, aviso, empresa, sueldo publicado, cuánto se pediría,
 desde dónde, y una línea de por qué calza. Separa "match" de "revisar". Pregunta si alguno no le
 interesa: lo que descarte se marca con

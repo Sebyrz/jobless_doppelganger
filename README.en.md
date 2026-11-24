@@ -20,7 +20,7 @@ Your doppelganger does that work with you inside Claude:
 | **1. Start** | Creates your private data folder, connects Claude to your Chrome, and gets you signed in to GetOnBoard and LinkedIn. | Setup. It takes 10 minutes. |
 | **2. Profile** | Reads your CV, your LinkedIn and your past applications. Builds your profile (facts only, each with its source) and learns how you write. No CV? It asks for one or builds it with you. | Explaining who you are to every form. |
 | **3. Improve your CV** | Compares your CV and LinkedIn with what real listings for your role ask for, and tells you what to change, why, and how it reads, ready to paste. | Guessing why nobody calls. |
-| **4. Radar** | Sweeps GetOnBoard, Himalayas, Remotive, RemoteOK, Working Nomads and the job boards of 350 companies that hire remotely. Filters by your role, salary floor and country. Ranks by fit. | Hours of scrolling and listings that were never for you. |
+| **4. Radar** | Sweeps GetOnBoard, Himalayas, Remotive, RemoteOK, Working Nomads and the job boards of a list of 340 companies that hire remotely (on a given day, about half have open listings). Filters by your role, salary floor and country. Ranks by fit. | Hours of scrolling and listings that were never for you. |
 | **5. Apply** | Builds batches of 5–10 listings, writes every answer in your voice, shows you everything at once, and with your OK (or in auto mode) fills and submits the forms (GetOnBoard, Greenhouse, Ashby, Lever, Workable). | The forty minutes per application. |
 
 ## What makes it different
@@ -29,9 +29,10 @@ Your doppelganger does that work with you inside Claude:
 answer reaches a form, a checker screens it for AI phrasing ("I'm passionate about...", "leverage"),
 em-dash habits, bullets where they don't belong, and padding. If it sounds like a bot, it gets rewritten.
 
-**It makes nothing up.** Every number in an answer must exist in your profile or in the listing, or
-the answer is rejected. It never claims a degree you don't have, extra years, or a visa. What it
-doesn't know, it asks, and saves for next time.
+**It writes only from your facts.** Before sending, a checker rejects an answer that carries a number,
+a degree or a name (client, tool, company) that is in neither your profile nor the listing. What it
+doesn't know, it asks, and saves for next time. The checker is a text filter and can miss things,
+which is why every answer it sends is saved for you to read.
 
 **It sells with proof, not adjectives.** For each listing it picks the evidence that matters to that
 company: the number, the client, the project. "You need X; I did Y" beats "I'm a proactive, results-driven professional".
@@ -46,8 +47,9 @@ that only you can answer, up to 15 a day). Anything doubtful stays as a draft, a
 you what it sent, answer by answer. In both modes, passwords, codes and CAPTCHAs are yours to enter,
 and on LinkedIn you press the final button.
 
-**Your data stays on your computer.** Everything about you lives in `~/.doppelganger`. The plugin has no
-server of its own and sends your data nowhere.
+**Your data lives on your computer.** Everything about you is in `~/.doppelganger`. The plugin has no
+server of its own and sends your data to no one. Claude reads it to do the work, like any file you
+show it, and each form receives what you approve sending.
 
 ## Install
 

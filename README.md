@@ -21,7 +21,7 @@ Tu doppelganger hace ese trabajo contigo dentro de Claude:
 | **1. Empezar** | Crea tu carpeta privada, conecta Claude a tu Chrome y te deja con la sesión abierta en GetOnBoard y LinkedIn. | Configurar cosas. Son 10 minutos. |
 | **2. Perfil** | Lee tu CV, tu LinkedIn y tus postulaciones pasadas. Arma tu perfil (solo hechos, con su fuente) y aprende cómo escribes tú. Si no tienes CV, te lo pide o lo arma contigo. | Explicarle a cada formulario quién eres. |
 | **3. Mejorar CV** | Compara tu CV y tu LinkedIn con lo que piden los avisos reales de tu rol y te dice qué cambiar, por qué y cómo queda, listo para pegar. | Adivinar por qué no te llaman. |
-| **4. Radar** | Barre GetOnBoard, Himalayas, Remotive, RemoteOK, Working Nomads y las bolsas de 350 empresas que contratan remoto. Filtra por tu rol, tu piso de sueldo y tu país. Ordena por calce. | Horas de scroll y avisos que no eran para ti. |
+| **4. Radar** | Barre GetOnBoard, Himalayas, Remotive, RemoteOK, Working Nomads y las bolsas de una lista de 340 empresas que contratan remoto (un día cualquiera, cerca de la mitad tiene avisos abiertos). Filtra por tu rol, tu piso de sueldo y tu país. Ordena por calce. | Horas de scroll y avisos que no eran para ti. |
 | **5. Postular** | Arma tandas de 5 a 10 avisos, escribe cada respuesta con tu voz, te muestra todo junto, y con tu OK (o en modo automático) llena y envía los formularios (GetOnBoard, Greenhouse, Ashby, Lever, Workable). | Los 40 minutos por postulación. |
 
 ## Lo que lo hace distinto
@@ -31,9 +31,10 @@ cualquier respuesta llegue a un formulario, un revisor la pasa por un filtro: fr
 passionate about...", "me apasiona"), guiones largos, viñetas donde no van, respuestas infladas.
 Si algo suena a robot, se reescribe.
 
-**No inventa nada.** Cada número de una respuesta tiene que estar en tu perfil o en el aviso; si no,
-se rechaza. Nunca afirma un título que no tienes, ni años de más, ni una visa. Lo que no sabe, te lo
-pregunta y lo anota para la próxima.
+**Escribe solo con tus hechos.** Antes de enviar, un revisor rechaza la respuesta si trae un número,
+un título o un nombre (cliente, herramienta, empresa) que no está en tu perfil ni en el aviso. Lo que
+no sabe, te lo pregunta y lo anota para la próxima. El revisor es un filtro de texto y se le pueden
+pasar cosas: por eso cada respuesta enviada queda guardada y la puedes leer.
 
 **Vende con pruebas, no con adjetivos.** Para cada aviso elige la prueba tuya que le sirve a esa
 empresa: el número, el cliente, el proyecto. "Ustedes necesitan X; yo hice Y" le gana a "soy
@@ -49,8 +50,9 @@ pregunta que te toque a ti, hasta 15 al día). Lo dudoso queda en borrador y al 
 mandó, con cada respuesta. En los dos modos, contraseñas, códigos y CAPTCHAs los pones tú, y en
 LinkedIn el botón final lo aprietas tú.
 
-**Tus datos no salen de tu computador.** Todo lo tuyo vive en `~/.doppelganger`. El plugin no trae ni
-manda datos personales a ningún servidor propio.
+**Tus datos viven en tu computador.** Todo lo tuyo está en `~/.doppelganger`. El plugin no tiene
+servidor propio ni manda tus datos a nadie. Claude los lee para trabajar, igual que cualquier archivo
+que le muestras, y cada formulario recibe lo que tú apruebas enviarle.
 
 ## Cómo se ve
 
@@ -114,7 +116,7 @@ local se configuran en tu perfil.
 las apruebas una por una. Si un formulario te pide declarar que no usaste IA, el agente no lo firma
 por ti.
 
-**¿Qué pasa con mis datos?** Quedan en `~/.doppelganger` en tu computador. Las búsquedas de avisos van a
+**¿Qué pasa con mis datos?** Quedan en `~/.doppelganger` en tu computador. Claude los lee para armar las respuestas. Las búsquedas de avisos van a
 las APIs públicas de cada bolsa, sin datos tuyos.
 
 ## Para quien quiera mirar el código

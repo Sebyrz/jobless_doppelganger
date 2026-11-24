@@ -13,6 +13,9 @@ el radar lo mezcla con el resto. `marcar` escribe en postulados.jsonl, el regist
 postulado (todas las fuentes).
 Estados de `marcar`: submitted · descartado · entrevista · rechazado · sin_respuesta · oferta
                      falta_dato · borrador (estos dos vuelven a aparecer en el radar)
+                     enviando: se anota ANTES de apretar enviar. Si la sesión se corta, el aviso no
+                     vuelve a la cola ni se manda dos veces; `resumen` lo muestra para revisarlo a mano.
+    python3 cola.py marcar ... --cv cv/pm.pdf --pedir "4000 USD"   # con qué CV y qué sueldo se postuló
     python3 cola.py resumen      # cuántas enviadas, por semana y por estado
     python3 cola.py elegibles    # modo automático: qué avisos se pueden enviar solos hoy (y cuántos quedan)
     python3 cola.py marcar ... --modo auto --respuestas resp.json   # guarda lo que se envió, para auditar
@@ -53,9 +56,13 @@ def agregar(fuente, url, titulo, empresa, ubicacion="", lo=None, hi=None, desc="
     return True, f"nivel {nivel}"
 
 
-def marcar(url, estado, titulo="", empresa="", nota="", modo="", respuestas=None) -> None:
+def marcar(url, estado, titulo="", empresa="", nota="", modo="", respuestas=None, cv="", pedir="") -> None:
     rec = {"url": url, "title": titulo, "company": empresa, "status": estado, "nota": nota,
            "ts": datetime.datetime.now().isoformat(timespec="seconds")}
+    if cv:
+        rec["cv"] = cv           # el archivo que se subió
+    if pedir:
+        rec["pedir"] = pedir     # el sueldo que se escribió en el formulario
     if modo:
         rec["modo"] = modo
     if respuestas:
@@ -92,8 +99,11 @@ def elegibles(cola: list[dict] | None = None) -> tuple[list[dict], list[tuple[di
     c = config.cargar()
     cupo = max(0, int(c["auto_max_dia"]) - auto_hoy())
     si, no = [], []
+    import radar   # acá y no arriba: radar es pesado y solo hace falta para este cruce
+    done = radar.hechos()
     for r in (cola if cola is not None else _rows(COLA)):
-        why = por_que_no_auto(r, c)
+        # la cola es una foto de la última corrida del radar: lo enviado después sigue en ella
+        why = "ya postulado (o envío sin confirmar)" if radar.ya_postulado(r, done) else por_que_no_auto(r, c)
         if why:
             no.append((r, why))
         elif len(si) < cupo:
@@ -101,6 +111,15 @@ def elegibles(cola: list[dict] | None = None) -> tuple[list[dict], list[tuple[di
         else:
             no.append((r, f"tope diario de {c['auto_max_dia']} envíos automáticos"))
     return si, no, cupo - len(si)
+
+
+def sin_confirmar(rows: list[dict] | None = None) -> list[dict]:
+    """Avisos cuyo último estado es 'enviando': se apretó (o se iba a apretar) enviar y no hay confirmación."""
+    import radar
+    ultimo = {}
+    for r in (rows if rows is not None else _rows(LOG)):
+        ultimo[radar.clave_url(r.get("url", ""))] = r
+    return [r for r in ultimo.values() if r.get("status") == "enviando"]
 
 
 def resumen() -> None:
@@ -115,6 +134,12 @@ def resumen() -> None:
             por_semana[sem] = por_semana.get(sem, 0) + 1
     print("[registro] por estado: " + ", ".join(f"{k} {v}" for k, v in sorted(por_estado.items(), key=lambda x: -x[1])))
     print("[registro] enviadas por semana: " + ", ".join(f"{k}: {v}" for k, v in sorted(por_semana.items())))
+    colgados = sin_confirmar(rows)
+    if colgados:
+        print(f"[registro] OJO: {len(colgados)} envíos quedaron a medias (se anotó 'enviando' y nunca la confirmación). "
+              "Revisa en el sitio si salieron y márcalos submitted o borrador:")
+        for r in colgados:
+            print(f"    {r['ts'][:16]} | {r.get('title', '')[:40]} @ {r.get('company', '')[:20]} | {r['url']}")
     auto = sum(1 for r in rows if r.get("modo") == "auto" and r["status"] == "submitted")
     if auto:
         print(f"[registro] enviadas en modo automático: {auto} (hoy {auto_hoy(rows)})")
@@ -134,6 +159,8 @@ def main():
     m.add_argument("--titulo", default=""); m.add_argument("--empresa", default=""); m.add_argument("--nota", default="")
     m.add_argument("--modo", default="", choices=["", "auto", "revisado"], help="auto = se envió sin que vieras la tanda")
     m.add_argument("--respuestas", default="", help="JSON con [{q, a}] tal como se enviaron")
+    m.add_argument("--cv", default="", help="archivo de CV que se subió")
+    m.add_argument("--pedir", default="", help="sueldo que se escribió en el formulario")
     sub.add_parser("elegibles")
     v = sub.add_parser("ver")
     v.add_argument("--top", type=int, default=20); v.add_argument("--fuente", default="")
@@ -145,7 +172,7 @@ def main():
         print(("[cola] agregado: " if ok else "[cola] no entra: ") + why)
     elif args.cmd == "marcar":
         resp = json.loads(Path(args.respuestas).read_text(encoding="utf-8")) if args.respuestas else None
-        marcar(args.url, args.estado, args.titulo, args.empresa, args.nota, args.modo, resp); print(f"[registro] {args.estado}: {args.titulo} @ {args.empresa}")
+        marcar(args.url, args.estado, args.titulo, args.empresa, args.nota, args.modo, resp, args.cv, args.pedir); print(f"[registro] {args.estado}: {args.titulo} @ {args.empresa}")
     elif args.cmd == "resumen":
         resumen()
     elif args.cmd == "elegibles":

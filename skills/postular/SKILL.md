@@ -52,8 +52,9 @@ y el aviso.
   `criterio.pedir(job)` (campo numérico en USD), ya vienen en la cola como `pedir_texto` y `pedir`.
 - **Nunca:** un número, cliente, herramienta o título que no esté en `perfil.md`; confesar huecos
   ("no tengo experiencia en..."); prometer ("aprendo rápido", "me certifico").
-- Revisa cada respuesta: `python3 "$S/guardia.py" revisar --tipo why|cover|corta --texto "..." --permitir <sueldo>`
-  (con `--aviso archivo.txt` si citas números del aviso). Si marca algo, reescribe. No se envía igual.
+- Revisa cada respuesta: `python3 "$S/guardia.py" revisar --tipo why|cover|corta --texto "..." --aviso aviso.txt --permitir <sueldo>`.
+  Pasa siempre `--aviso` (un archivo con el texto del aviso): con él también se revisan los nombres de
+  clientes, herramientas y empresas. Un nombre real que falta en `perfil.md` se anota ahí con su OK. Si marca algo, reescribe. No se envía igual.
 - Lo que el aviso pide y ella no tiene va a `huecos.md` (aviso, hueco, lo más cercano que sí tiene),
   no al formulario.
 
@@ -71,9 +72,14 @@ de su voz que vas a tener).
 
 Uno por uno, siguiendo `referencias/formularios.md`. En cada uno:
 1. Abre el formulario, llena, sube el CV, revisa que todo quedó (lee la página).
-2. Envía. **Confirma el éxito** con lo que muestra la página.
-3. Registra:
-   `python3 "$S/cola.py" marcar --url <url> --estado submitted --titulo "..." --empresa "..." [--nota "..."]`
+2. **Antes de apretar enviar**, anota la intención:
+   `python3 "$S/cola.py" marcar --url <url> --estado enviando --titulo "..." --empresa "..."`.
+   Si la sesión se corta justo ahí, el aviso no vuelve a la cola y no se manda dos veces.
+3. Envía. **Confirma el éxito** con lo que muestra la página.
+4. Registra:
+   `python3 "$S/cola.py" marcar --url <url> --estado submitted --respuestas resp.json --cv <archivo> --pedir "<sueldo>" --titulo "..." --empresa "..." [--nota "..."]`
+   (`resp.json` = `[{"q": "...", "a": "..."}]`: cada pregunta con la respuesta tal como quedó. Con el CV
+   y el sueldo, es lo que ella va a releer el día de la entrevista.)
    Si quedó a medias: `--estado borrador` o `--estado falta_dato` con la nota de qué falta.
 
 LinkedIn Easy Apply: llenas con ella presente y **ella aprieta el envío final**.
@@ -81,7 +87,8 @@ LinkedIn Easy Apply: llenas con ella presente y **ella aprieta el envío final**
 ## 5. Cerrar
 
 - Resumen en el chat: enviadas (con link), no enviadas y por qué, lo que le toca a ella.
-- `python3 "$S/cola.py" resumen` para el conteo acumulado.
+- `python3 "$S/cola.py" resumen` para el conteo acumulado. Si avisa de envíos a medias, abre cada
+  uno en el sitio con ella, mira si salió y márcalo `submitted` o `borrador`.
 - Datos nuevos que dio → `perfil.md`. Respuestas que corrigió → `banco.jsonl`.
 - Sugiérele marcar las respuestas de empresas cuando lleguen:
   `cola.py marcar --url ... --estado entrevista|rechazado|oferta`.

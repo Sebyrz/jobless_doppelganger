@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """
 guardia.py — revisa una respuesta antes de que vaya a un formulario. Claude redacta con tu voz y tu
-perfil; esto revisa en frío lo que se cuela: frases de IA, números que no están en tu perfil, títulos
-que no tienes, huecos confesados, promesas y largo.
+perfil; esto revisa en frío lo que se cuela: frases de IA, números (en dígitos o en letras) que no están
+en tu perfil, títulos que no tienes o que tu perfil niega, huecos confesados, promesas y largo. Con
+--aviso también marca nombres propios (clientes, herramientas, empresas) que no están en tu perfil ni
+en el aviso. Es un filtro de texto, no entiende lo que lee: baja el riesgo, no lo elimina.
 
     python3 guardia.py revisar --tipo why --texto "Ustedes ..."      # tipos: why, cover, corta, default
     echo "texto" | python3 guardia.py revisar --tipo cover --aviso aviso.txt
@@ -57,6 +59,49 @@ SOLO_TU = [
 ]
 
 
+# números escritos con letras: "lideré a diez personas" es tan número como "10". Del cuatro para arriba
+# (uno, dos y tres son ruido, igual que en dígitos). "once" queda fuera: en inglés es otra palabra.
+NUM_PALABRA = {"cuatro": 4, "cinco": 5, "seis": 6, "siete": 7, "ocho": 8, "nueve": 9, "diez": 10, "doce": 12, "quince": 15,
+               "veinte": 20, "treinta": 30, "cuarenta": 40, "cincuenta": 50, "cien": 100,
+               "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10, "eleven": 11, "twelve": 12,
+               "fifteen": 15, "twenty": 20, "thirty": 30, "forty": 40, "fifty": 50, "hundred": 100}
+_NUM_PALABRA_RX = re.compile(r"\b(" + "|".join(NUM_PALABRA) + r")\b", re.I)
+
+# una línea del perfil que niega ("no tengo MBA", "sin terminar") no respalda un título
+_NIEGA = re.compile(r"\b(no|sin|not|never|nunca|without|ni|incomplet\w*|unfinished|inconclus\w*|pendiente|dropped)\b", re.I)
+
+# palabras con mayúscula que no son un cliente, una herramienta ni una empresa
+_NO_ES_NOMBRE = {"i", "i'm", "i've", "i'd", "i'll", "latam", "latin", "america", "américa", "americas", "english", "spanish",
+                 "español", "inglés", "usd", "us", "usa", "europe", "europa", "ai", "ia", "api", "saas", "b2b", "b2c",
+                 "kpi", "kpis", "okr", "okrs", "cv", "ceo", "cto", "coo", "cfo", "pm", "po", "qa", "ux", "ui", "it", "hr",
+                 "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "january", "february",
+                 "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"}
+_NOMBRE_RX = re.compile(r"[A-ZÁÉÍÓÚÑ][A-Za-zÁÉÍÓÚÑáéíóúñ0-9&+#'’-]+")
+
+
+def _afirma(perfil: str, termino: str) -> bool:
+    """El perfil nombra `termino` en una línea que no lo niega."""
+    t = termino.lower()
+    return any(t in l.lower() and not _NIEGA.search(l) for l in perfil.splitlines())
+
+
+def nombres_sin_fuente(texto: str, fuente: str) -> list[str]:
+    """Nombres propios (clientes, herramientas, empresas) de la respuesta que no están en `fuente`.
+    No mira la primera palabra de cada frase: ahí la mayúscula no dice nada."""
+    fl, out = fuente.lower(), []
+    for m in _NOMBRE_RX.finditer(texto):
+        antes = texto[:m.start()].rstrip()
+        if not antes or antes[-1] in ".!?:;¿¡\"“(\n":
+            continue
+        w = m.group(0).strip("'’-")
+        base = w.lower()
+        if base in _NO_ES_NOMBRE or base.rstrip("s") in fl or base in fl:
+            continue
+        if w not in out:
+            out.append(w)
+    return out
+
+
 def _norm_num(s: str) -> str:
     return re.sub(r"[.,\s]", "", s)
 
@@ -86,9 +131,15 @@ def revisar(texto: str, tipo: str = "default", aviso: str = "", permitidos: list
             continue
         if nn and nn not in fuentes_ok:
             problemas.append(f"número que no está en tu perfil: {n.rstrip('.,')}")
+    for m in _NUM_PALABRA_RX.finditer(texto):
+        if str(NUM_PALABRA[m.group(1).lower()]) not in fuentes_ok and m.group(1).lower() not in (perfil + " " + aviso).lower():
+            problemas.append(f"número que no está en tu perfil: {m.group(1)}")
     m = TITULO.search(texto)
-    if m and m.group(0).lower() not in perfil.lower():
+    if m and not _afirma(perfil, m.group(0)):
         problemas.append(f"afirma un título o grado que tu perfil no dice: '{m.group(0)}'")
+    if aviso:   # sin el aviso, el nombre de la empresa a la que postulas saldría siempre como desconocido
+        for w in nombres_sin_fuente(texto, perfil + " " + aviso + " " + " ".join(permitidos or [])):
+            problemas.append(f"nombre que no está en tu perfil ni en el aviso: '{w}' (si es real, anótalo en perfil.md)")
     for rx in HUECOS:
         if re.search(rx, low):
             problemas.append("confiesa un hueco o promete algo (eso va a huecos.md, no al formulario)")
@@ -118,7 +169,7 @@ if __name__ == "__main__":
     r = sub.add_parser("revisar")
     r.add_argument("--tipo", default="default", choices=list(LARGO))
     r.add_argument("--texto", default=None)
-    r.add_argument("--aviso", default=None, help="archivo con el texto del aviso (sus números valen)")
+    r.add_argument("--aviso", default=None, help="archivo con el texto del aviso: sus números y nombres valen, y activa la revisión de nombres propios")
     r.add_argument("--permitir", action="append", default=[], help="número extra que vale (ej. el sueldo pedido)")
     p = sub.add_parser("pregunta")
     p.add_argument("q")
